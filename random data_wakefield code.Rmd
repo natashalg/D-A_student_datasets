@@ -1,0 +1,598 @@
+---
+title: "random data"
+author: "Natasha"
+date: "10/7/2018"
+output: html_document
+---
+
+```{r}
+library(pacman)
+p_load_gh("trinker/wakefield")
+```
+
+
+sample of items you can put into a dataset 
+
+```{r}
+race(n=10)
+sex(10)
+likert_7(10)
+gpa(10)
+```
+
+
+
+use the r_data_frame to combine the varaibles into a dataset 
+
+```{r}
+set.seed(10)
+
+r_data_frame(
+    n = 500,
+    id,
+    race,
+    age,
+    sm,
+    ma,
+    Start = hour,
+    End = hour,
+    iq,
+    height,
+    died
+)
+```
+
+
+
+The original blog post provided a means for adding missing values. wakefield keeps this alive and adds more flexibility. It is no longer a part of the data generation process but a function, r_na, that is called after the data set has been generated. The user can specify which columns to add NAs to. By default column 1 is excluded. This works nicely within a dplyr/magrittr pipe line. Note: dpyr has an id function ad well so the prefix wakedfield:: must be used for id.
+
+```{r}
+p_load(dplyr)
+set.seed(10)
+
+r_data_frame(
+    n = 30,
+    id,
+    state,
+    month,
+    sat,
+    minute,
+    iq,
+    zip_code,
+    year,
+    Scoring = rnorm,
+    Smoker = valid,
+    sentence
+) %>%
+    r_na(prob=.25)
+
+```
+
+There’s still a default data set function, r_data, in case the functionality of the original random data generation function is missed or if you’re in a hurry and aren’t too picky about the data being generated.
+
+```{r}
+set.seed(10)
+
+r_data(1000)
+```
+
+make columns that are correlated or any function of another column.
+
+```{r}
+p_load(dplyr)
+set.seed(10)
+
+dplyr::data_frame(
+    x = 1:10,
+    y = x + rnorm(10)
+)
+```
+
+
+The user can use the modular variable functions inside of dplyr::data_frame and have this functionality but the column name and n must explicit be passed to each variable.
+
+```{r}
+set.seed(10)
+
+dplyr::data_frame(
+    ID = wakefield::id(n=10),
+    Smokes = smokes(n=10),
+    Sick = ifelse(Smokes, sample(5:10, 10, TRUE), sample(0:4, 10, TRUE)),
+    Death = ifelse(Smokes, sample(0:1, 10, TRUE, prob = c(.2, .8)), sample(0:1, 10, TRUE, prob = c(.7, .3)))
+)
+```
+
+## Export data to excel
+
+```{r}
+library(xlsx)
+write.xlsx(mydata, "c:/mydata.xlsx")   ##### DOESNT WORK #########
+```
+
+
+```{r}
+write.csv(dataset, "filename.csv")
+```
+
+
+
+## to SPSS
+
+```{r}
+# write out text datafile and
+# an SPSS program to read it
+library(foreign)
+write.foreign(mydata, "c:/mydata.txt", "c:/mydata.sps",   package="SPSS")
+```
+
+## To SAS
+
+```{r}
+# write out text datafile and
+# an SAS program to read it
+library(foreign)
+write.foreign(mydata, "c:/mydata.txt", "c:/mydata.sas",   package="SAS")
+```
+
+## To a Tab delimited text file 
+
+```{r}
+write.table(mydata, "c:/mydata.txt", sep="\t")
+```
+
+
+```{r}
+church <- r_data_frame(
+    n= 125,
+    id,
+    Scoring= round(digits=0, rnorm(n=125, mean=5, sd=1)),
+    Scoring= round(digits=0, rnorm(n=125, mean=4, sd=1)),
+    age(x=19:32),
+    sex,
+    race
+    )
+```
+
+ 
+
+
+
+```{r}
+depillo <- r_data_frame(
+  n=150,
+  id,
+  likert(n=150),
+  likert(n=150),
+  race,
+  sex(n=150, x="female"),
+  answer(n=150, x= c("track", "soccer")),
+  Scoring= rnorm(mean=5, sd=1),
+  Scoring= rnorm(mean=4, sd=1)
+)
+```
+
+```{r}
+dickerson <-r_data_frame(
+  n=20,
+  id,
+  likert(n=20),
+  race,
+  sex,
+  speed_mph(n=20, mean=55, sd=10, min=35, max=NULL, digits=0, name="Speed sector a"),
+  time_stamp(),
+  speed_mph(n=20, mean=55, sd=10, min=35, max=NULL, digits=0, name="Speed sector b"),
+  time_stamp(),
+  speed_mph(n=20, mean=55, sd=10, min=35, max=NULL, digits=0, name="Speed sector c"),
+  time_stamp()
+  
+)
+```
+
+```{r}
+gallaher <- r_data_frame(
+  n=150,
+  id,
+  sex_inclusive(n=150, x= c("Male", "Female", "Intersex")),
+  race,
+  age(x=18:40),
+  likert(n=150, x= c(1, 2, 3, 4, 5)),
+  likert(n=150, x= c(1, 2, 3, 4, 5)),
+  likert(n=150, x= c("1", "2", "3", "4"), prob= NULL, name="Group"),
+  answer(n=150, x= c("1", "2")),
+  answer(n=150, x= c("1", "2")),
+  answer(n=150, x= c("1", "2"))
+  
+)
+```
+
+```{r}
+gillmore <- r_data_frame(
+  n=70,
+  id,
+  sex,
+  race,
+  group(n=70, x= c("control", "treatment"), name="group"),
+  likert_7(n=70, x = c("0", "1", "2", "3",
+      "4"), prob = NULL,
+      name = "Baseline"),
+  likert_7(n=70, x = c("0", "1", "2", "3",
+      "4"), prob = NULL,
+      name = "PSS_1"),
+  likert_7(n=70, x = c("0", "1", "2", "3",
+      "4"), prob = NULL,
+      name = "PSS_2"),
+  likert_7(n=70, x = c("0", "1", "2", "3",
+      "4"), prob = NULL,
+      name = "PSS_4"),
+  likert_7(n=70, x = c("0", "1", "2", "3",
+      "4"), prob = NULL,
+      name = "PSS_4"),
+  likert_7(n=70, x = c("0", "1", "2", "3",
+      "4"), prob = NULL,
+      name = "PSS_5"),
+  likert_7(n=70, x = c("0", "1", "2", "3",
+      "4"), prob = NULL,
+      name = "PSS_6")
+)
+```
+
+```{r}
+gipson <- r_data_frame(
+  n=100,
+  id,
+  sex,
+  race,
+  age(x=19:32),
+  Scoring= rnorm(n=100, mean=40, sd=1),
+  Scoring= rnorm(n=100, mean=45, sd=1)
+)
+```
+
+```{r}
+hall <- r_data_frame(
+  n=63,
+  id,
+  sex,
+  education,
+  race,
+  age(x=16:35),
+  answer(n=63, x= c("control", "synesthetes")),
+  Scoring= rnorm,
+  Scoring= rnorm,
+  likert()
+)
+```
+
+
+```{r}
+hanley <-r_data_frame(
+  n=7798,
+  id,
+  sex,
+  age(16:19),
+  race,
+  gpa,
+  Scoring=rnorm(n=7798, mean=8, sd=1)
+)
+```
+
+```{r}
+hollomon <-r_data_frame(
+  n=20,
+  id,
+  age(18:23),
+  sex,
+  race,
+  likert(),
+  Scoring=rnorm(n=20, mean=75, sd=1),
+  Scoring=rnorm(n=20, mean=88, sd=1)
+)
+```
+
+```{r}
+mcelhaney <-r_data_frame(
+  n=28,
+  id,
+  age(4:5),
+  sex,
+  race,
+  likert(),
+  Scoring= rnorm(n=28, mean=40, sd=1),
+  Scoring= rnorm(n=28, mean=45, sd=1),
+  answer(n=28, x= c("excell", "home"))
+)
+```
+
+```{r}
+mckeel <-r_data_frame(
+  n=100,
+  id,
+  age(18:24),
+  race,
+  sex,
+  likert(),
+  Scoring= rnorm(n=100, mean=48, sd=1)
+  
+)
+```
+
+```{r}
+riddle <-r_data_frame(
+  n=100,
+  id,
+  age(3:18),
+  race,
+  sex,
+  Scoring= round(digits=0, rnorm(n=100, mean=5, sd=1)),
+  Scoring= rnorm(n=100, mean=4, sd=1)
+  
+)
+```
+
+```{r}
+sexton <-r_data_frame(
+  n=60,
+  id,
+  age(3:7),
+  race,
+  sex,
+  likert(),
+  Scoring= rnorm(n=60, mean=767, sd=2),
+  Scoring= rnorm(n=60, mean=790, sd=2)
+  
+)
+```
+
+```{r}
+smart <-r_data_frame(
+  n=100,
+  id,
+  age,
+  race,
+  sex,
+  likert(),
+  likert(),
+  likert(),
+  likert(),
+  answer(n=100, x= c("oldest", "middle", "youngest"))
+  
+)
+```
+
+```{r}
+stephens <-r_data_frame(
+  n=100,
+  id,
+  age(12:14),
+  race,
+  sex,
+  Scoring= rnorm(n=100, mean=790, sd=2),
+  Scoring= rnorm(n=100, mean=790, sd=2)
+)
+```
+
+```{r}
+woodward <-r_data_frame(
+  n=100,
+  id,
+  age(18:24),
+  race,
+  sex,
+  likert()
+)
+```
+
+
+```{r}
+write.csv(woodward, "woodward.csv")
+
+```
+
+```{r}
+write.csv(church, "church.csv")
+write.csv(depillo, "depillo.csv")
+write.csv(dickerson, "dickerson.csv")
+write.csv(gallaher, "gallaher.csv")
+write.csv(gillmore, "gillmore.csv")
+write.csv(gipson, "gipson.csv")
+write.csv(hanley, "hanley.csv")
+write.csv(hollomon, "hollomon.csv")
+write.csv(mcelhaney, "mcelhaney.csv")
+write.csv(mckeel, "mckeel.csv")
+write.csv(riddle, "riddle.csv")
+write.csv(sexton, "sexton.csv")
+write.csv(smart, "smart.csv")
+write.csv(stephens, "stephens.csv")
+write.csv(hall, "hall.csv")
+```
+
+
+
+#### 001 datasets
+
+```{r}
+alu <-r_data_frame(
+  n=100,
+  id,
+  race,
+  age(18:50),
+ Scoring= round(digits=0, rnorm(n=100, mean=2.3, sd=1)),
+  likert_5(n=100, x = c("0", "1", "2", "3", "4",
+      "5"), prob = NULL, name = "Likert"),
+  likert_5(n=100, x = c("0", "1", "2", "3",
+      "4"), prob = NULL, name = "Likert")
+)
+
+```
+
+
+```{r}
+arnett <- r_data_frame(
+  n=360,
+  id,
+  race,
+  sex,
+  age(17:19),
+  gpa,
+  Scoring= round(digits=0, rnorm(n=360, mean=5, sd=1)),
+ 23,
+  gpa,
+  Scoring= round(digits=2, rnorm(n=360, mean=.76, sd=.8)),
+  Scoring= round(digits=0, rnorm(n=360, mean=88, sd=2))
+)
+```
+
+```{r}
+gillish <- r_data_frame(
+  n=100,
+  id=("treatment"),
+  race,
+  sex,
+  age(13:18),
+  Scoring= round(digits=0, rnorm(n=100, mean=5, sd=1)),
+  Scoring= round(digits=2, rnorm(n=100, mean=50, sd=.8)),
+  Scoring= round(digits=2, rnorm(n=100, mean=23, sd=.5))
+)
+```
+
+```{r}
+gillish_control <- r_data_frame(
+  n=10,
+  id=("control"),
+  race,
+  sex,
+  age(13:18),
+  Scoring= round(digits=0, rnorm(n=100, mean=5, sd=1)),
+  Scoring =round(digits=0, rnorm(n=10, mean=6, sd=1))
+)
+```
+
+```{r}
+a_gillish_baker_powers_murr <-cbind(gillish, gillish_control)
+```
+
+
+```{r}
+baker_other <- r_data_frame(
+  n=150,
+  group(n=150, x= c("Control", "Treatment"), name="group"),
+  race,
+  sex,
+  age(13:18),
+  Scoring= round(digits=0, rnorm(n=150, mean=5, sd=1)),
+  Scoring= round(digits=2, rnorm(n=150, mean=50, sd=.8)),
+  Scoring= round(digits=2, rnorm(n=150, mean=23, sd=.5))
+)
+```
+
+
+
+```{r}
+blakley_freeman <-r_data_frame(
+  n=20,
+  group(n=20, x= c("Control", "Treatment"), name="group"),
+  id,
+  race,
+  age(15:18),
+  Scoring= round(digits=0, rnorm(n=20, mean=6, sd=1)),
+  Scoring= round(digits=2, rnorm(n=20, mean=125, sd=2))
+)
+```
+
+```{r}
+gibson <-r_data_frame(
+  n=1400,
+  group(n=1400, x= c("College", "Other"), name="group"),
+  id,
+  sex,
+  race(n=1400, c("White", "Black"), prob= c(.5,.5), name= "race"),
+  age(18:45),
+  Scoring= round(digits=0, rnorm(n=1400, mean=8, sd=2))
+)
+```
+
+```{r}
+gunter <-r_data_frame(
+  n=300,
+  race,
+  sex,
+  group(n=300, x= c("control", "treatment"), name="group"),
+  age(15:25),
+  Scoring= round(digits=0, rnorm(n=300, mean=5, sd=.8))
+)
+```
+
+
+
+########
+```{r}
+hill <-r_data_frame(
+  n=100,
+  id,
+  race,
+  sex,
+  age(40:65),
+  likert_7(n=100, x = c("1", "2", "3", "4",
+      "5", "6", "7"), prob = NULL,
+      name = "Likert"),
+  Scoring= round(digits=0, rnorm(n=100, mean=3, sd=1)),
+ likert_7(n=100, x = c("0", "1", "2", "3",
+      "4", "5", "6", "7", "8"), prob = NULL,
+      name = "Likert")
+)
+```
+
+```{r}
+hollandsworth_welch <-r_data_frame(
+  n=500,
+  id,
+  sex,
+  race,
+  age(18:23),
+  gpa,
+  Scoring= round(digits=0, rnorm(n=500, mean=13, sd=2)),
+  Scoring= round(digits=0, rnorm(n=500, mean=4, sd=.6)),
+  gpa,
+  Scoring= round(digits=0, rnorm(n=500, mean=11, sd=2)),
+  Scoring= round(digits=0, rnorm(n=500, mean=3, sd=.6))
+  )
+```
+
+```{r}
+jordan_sharpe <-r_data_frame(
+  n=533,
+  id,
+  sex,
+  race,
+  age(14:18),
+  Scoring= round(digits=0, rnorm(n=533, mean=76, sd=2)),
+  Scoring= group(n=533, x= c("cell phone", "computer"), name="group"), round(digits=0, rnorm(n=533, mean=22, sd=2))
+)
+```
+
+```{r}
+woodring <- r_data_frame(
+ n=500,
+ id,
+ race,
+ sex,
+ age(18:23),
+ Scoring= round(digits=0, rnorm(n=500, mean=23, sd=2)),
+ Scoring= round(digits=0, rnorm(n=500, mean=25, sd=2))
+)
+```
+
+```{r}
+write.csv(woodring, "woodring.csv")
+write.csv(jordan_sharpe, "jordan_sharpe.csv")
+write.csv(hollandsworth_welch, "hollandsworth_welch.csv")
+write.csv(hill, "hill.csv")
+write.csv(gunter, "gunter.csv")
+write.csv(gibson, "gibson.csv")
+write.csv(blakley_freeman, "blakley_freeman.csv")
+write.csv(baker_other, "baker_other.csv")
+write.csv(a_gillish_baker_powers_murr, "a_gillish_baker_powers_murr.csv")
+write.csv(arnett, "arnett.csv")
+write.csv(alu, "alu.csv")
+```
+
